@@ -1,0 +1,170 @@
+{
+  "income": [
+    {
+      "id": 1,
+      "name": "Salary",
+      "amount": 89000.0,
+      "frequency": "Monthly"
+    }
+  ],
+  "expenses": [
+    {
+      "id": 3,
+      "category": "Savings",
+      "name": "SIP Akash",
+      "amount": 4000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 4,
+      "category": "Savings",
+      "name": "SIP Sarika",
+      "amount": 3000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 5,
+      "category": "Savings",
+      "name": "RD Sarika",
+      "amount": 1000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 6,
+      "category": "Savings",
+      "name": "BC Sarika",
+      "amount": 10000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 7,
+      "category": "Other",
+      "name": "Sarika Expense",
+      "amount": 9000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 8,
+      "category": "Subscriptions",
+      "name": "Wifi",
+      "amount": 1300.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 9,
+      "category": "Subscriptions",
+      "name": "Netflix",
+      "amount": 500.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 10,
+      "category": "Other",
+      "name": "House help",
+      "amount": 2700.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 11,
+      "category": "Other",
+      "name": "Gym",
+      "amount": 1500.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 12,
+      "category": "Debt payments",
+      "name": "EMI",
+      "amount": 9000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 13,
+      "category": "Other",
+      "name": "Buffer",
+      "amount": 6000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 14,
+      "category": "Other",
+      "name": "Personal",
+      "amount": 12000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 15,
+      "category": "Housing",
+      "name": "Rent",
+      "amount": 10000.0,
+      "frequency": "Monthly"
+    },
+    {
+      "id": 16,
+      "category": "Housing",
+      "name": "Maintainance",
+      "amount": 5000.0,
+      "frequency": "Monthly"
+    }
+  ],
+  "net_worth_snapshots": [
+    {
+      "id": 1,
+      "date": "2026-10-02",
+      "assets": {
+        "Cash & checking": 80000.0,
+        "Savings": 457000.0,
+        "Investments": 78000.0,
+        "Property / other": 0.0
+      },
+      "liabilities": {
+        "Credit cards": 58000.0,
+        "Student loans": 0.0,
+        "Mortgage": 27000.0,
+        "Other debt": 173000.0
+      },
+      "total_assets": 615000.0,
+      "total_liabilities": 258000.0,
+      "net_worth": 357000.0
+    }
+  ],
+  "goals": [
+    {
+      "id": 1,
+      "name": "Sarika Gold",
+      "target_amount": 200000.0,
+      "current_amount": 100000.0,
+      "target_date": "2027-08-01",
+      "category": "Other"
+    },
+    {
+      "id": 2,
+      "name": "Emergency",
+      "target_amount": 1000000.0,
+      "current_amount": 0.0,
+      "target_date": "2027-12-31",
+      "category": "Emergency fund"
+    },
+    {
+      "id": 3,
+      "name": "House",
+      "target_amount": 5000000.0,
+      "current_amount": 0.0,
+      "target_date": "2030-12-31",
+      "category": "Home"
+    },
+    {
+      "id": 4,
+      "name": "Medical Fund",
+      "target_amount": 1000000.0,
+      "current_amount": 0.0,
+      "target_date": "2028-12-31",
+      "category": "Emergency fund"
+    }
+  ],
+  "settings": {
+    "currency": "Rs.",
+    "monthly_income_override": null
+  },
+  "budget_limits": {}
+}
