@@ -2,10 +2,30 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import copy
 from datetime import date, datetime
 
 import data_manager as dm
 import calculators as calc
+
+
+# These two helpers are intentionally defined here (not imported from
+# data_manager) and rely only on dm.DEFAULT_DATA / dm.save_data, which have
+# existed since the very first version of this app. That way app.py can't
+# crash with an AttributeError if it's ever deployed alongside an older
+# data_manager.py that hasn't picked up a newer helper function — a schema
+# mismatch like that should self-heal, not take the whole app down.
+def _fresh_data():
+    return copy.deepcopy(dm.DEFAULT_DATA)
+
+
+def _ensure_schema(data):
+    changed = False
+    for key, default_value in dm.DEFAULT_DATA.items():
+        if key not in data:
+            data[key] = copy.deepcopy(default_value)
+            changed = True
+    return data, changed
 
 st.set_page_config(
     page_title="Finly — Personal Financial Planner",
@@ -258,7 +278,7 @@ if "data" not in st.session_state:
 # Self-heal: if this browser session has been open since before a schema
 # change (new fields added in an app update), backfill them now instead of
 # crashing with a KeyError on an old, cached session_state dict.
-st.session_state.data, _schema_changed = dm.ensure_schema(st.session_state.data)
+st.session_state.data, _schema_changed = _ensure_schema(st.session_state.data)
 if _schema_changed:
     dm.save_data(st.session_state.data)
 
@@ -874,7 +894,7 @@ elif page == "Settings":
         st.warning("This will permanently delete all income, expenses, net worth snapshots, goals, and budget limits.")
         c1, c2 = st.columns(2)
         if c1.button("Yes, delete everything", type="primary", width='stretch'):
-            dm.save_data(dm.fresh_data())
+            dm.save_data(_fresh_data())
             st.session_state.data = dm.load_data()
             st.session_state["confirm_reset"] = False
             st.rerun()

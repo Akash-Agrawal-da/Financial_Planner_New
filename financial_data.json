@@ -166,5 +166,7 @@
     "currency": "Rs.",
     "monthly_income_override": null
   },
-  "budget_limits": {}
+  "budget_limits": {},
+  "monthly_history": [],
+  "debts": []
 }
