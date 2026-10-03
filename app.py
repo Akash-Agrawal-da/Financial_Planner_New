@@ -17,20 +17,28 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 # Design tokens
 # ---------------------------------------------------------------------------
+# All text/background pairings below are verified to meet WCAG AA contrast
+# (>=4.5:1 for normal text) so values stay legible in bright light / on
+# smaller mobile screens, not just on a calibrated desktop monitor.
 NAVY = "#0B1220"
 NAVY_ELEVATED = "#141B2B"
 NAVY_BORDER = "#1F2A3D"
 SURFACE = "#FFFFFF"
 BORDER = "#E2E5EB"
-TEXT_PRIMARY = "#0F172A"
-TEXT_SECONDARY = "#5B6472"
-ACCENT = "#0F766E"
-ACCENT_HOVER = "#0D9488"
-POSITIVE = "#16A34A"
-NEGATIVE = "#DC2626"
-WARN = "#D97706"
-INFO = "#2563EB"
-PALETTE = ["#0F766E", "#2563EB", "#D97706", "#DC2626", "#7C3AED", "#0891B2", "#65A30D", "#DB2777"]
+TEXT_PRIMARY = "#0F172A"      # 17.8:1 on white
+TEXT_SECONDARY = "#475569"    # 7.6:1 on white
+TEXT_TERTIARY = "#64748B"     # 4.8:1 on white — used where #94A0B2 used to fail contrast
+ACCENT = "#0F766E"            # 5.5:1 on white
+ACCENT_HOVER = "#0B6358"  # 7.1:1 with white button text (darker than accent, for :hover)
+POSITIVE = "#15803D"          # 5.0:1 on white
+POSITIVE_BG = "#F0FDF4"
+NEGATIVE = "#B91C1C"          # 6.5:1 on white
+NEGATIVE_BG = "#FEF2F2"
+WARN = "#B45309"              # 5.0:1 on white
+WARN_BG = "#FFFBEB"
+INFO = "#1D4ED8"              # 6.7:1 on white
+INFO_BG = "#EFF6FF"
+PALETTE = ["#0F766E", "#1D4ED8", "#B45309", "#B91C1C", "#7C3AED", "#0E7490", "#4D7C0F", "#BE185D"]
 
 # ---------------------------------------------------------------------------
 # Styling — light, professional "fintech dashboard" look: dark navy sidebar
@@ -52,7 +60,7 @@ st.markdown(f"""
         background-color: {NAVY};
     }}
     [data-testid="stSidebar"] * {{ color: #E2E8F0 !important; }}
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {{ color: #8B98B3 !important; }}
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {{ color: #A8B3C7 !important; }}
     [data-testid="stSidebar"] hr {{ border-color: {NAVY_BORDER} !important; }}
     [data-testid="stSidebar"] [data-testid="stMetric"] {{
         background-color: {NAVY_ELEVATED};
@@ -74,7 +82,7 @@ st.markdown(f"""
         font-size: 1.35rem; font-weight: 700; color: #FFFFFF !important;
         letter-spacing: -0.01em; margin-bottom: 0;
     }}
-    .brand-sub {{ color: #8B98B3 !important; font-size: 0.82rem; margin-top: -4px; }}
+    .brand-sub {{ color: #A8B3C7 !important; font-size: 0.82rem; margin-top: -4px; }}
 
     /* ---- Page header ---- */
     .finly-eyebrow {{ color: {ACCENT}; font-weight: 600; font-size: 0.82rem; margin-bottom: 2px; }}
@@ -99,7 +107,7 @@ st.markdown(f"""
         font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 600;
         color: {TEXT_PRIMARY}; font-feature-settings: "tnum"; letter-spacing: -0.01em;
     }}
-    .kpi-sublabel {{ color: #94A0B2; font-size: 0.78rem; margin-top: 4px; }}
+    .kpi-sublabel {{ color: {TEXT_TERTIARY}; font-size: 0.8rem; margin-top: 4px; }}
 
     /* ---- Native metric cards elsewhere in main content ---- */
     .main [data-testid="stMetric"] {{
@@ -120,15 +128,15 @@ st.markdown(f"""
 
     .goal-badge {{
         display: inline-block; padding: 3px 11px; border-radius: 999px;
-        background-color: #ECFDF5; color: {ACCENT}; font-size: 0.72rem;
+        background-color: {INFO_BG}; color: {INFO}; font-size: 0.76rem;
         font-weight: 600; margin-bottom: 8px;
     }}
-    .status-ok {{ background-color: #ECFDF5; color: {POSITIVE}; }}
-    .status-warn {{ background-color: #FFFBEB; color: {WARN}; }}
-    .status-over {{ background-color: #FEF2F2; color: {NEGATIVE}; }}
+    .status-ok {{ background-color: {POSITIVE_BG}; color: {POSITIVE}; }}
+    .status-warn {{ background-color: {WARN_BG}; color: {WARN}; }}
+    .status-over {{ background-color: {NEGATIVE_BG}; color: {NEGATIVE}; }}
     .status-pill {{
         display: inline-block; padding: 3px 11px; border-radius: 999px;
-        font-size: 0.72rem; font-weight: 600;
+        font-size: 0.76rem; font-weight: 700;
     }}
 
     /* ---- Buttons ---- */
@@ -150,6 +158,17 @@ st.markdown(f"""
     hr {{ border-color: {BORDER} !important; }}
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
+
+    /* ---- Mobile tweaks ---- */
+    @media (max-width: 640px) {{
+        .finly-title {{ font-size: 1.5rem; }}
+        .kpi-value {{ font-size: 1.35rem; }}
+        .kpi-card {{ padding: 14px 16px; }}
+        .main [data-testid="stMetric"] {{ padding: 14px 16px; }}
+        div.block-container {{ padding-left: 1rem; padding-right: 1rem; padding-top: 2rem; }}
+        .stButton button, .stFormSubmitButton button {{ min-height: 44px; }}
+        [data-testid="stNumberInput"] input, [data-baseweb="select"] > div {{ min-height: 44px; }}
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -272,6 +291,16 @@ if page == "Dashboard":
             st.plotly_chart(style_fig(fig, legend=True), width='stretch')
         else:
             st.info("Add expenses in the Budget tab to see the breakdown.")
+
+    if data["monthly_history"]:
+        st.markdown("#### Income vs. expenses over time")
+        hist_df = pd.DataFrame(data["monthly_history"])
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=hist_df["month"], y=hist_df["income"], name="Income", marker_color=POSITIVE))
+        fig.add_trace(go.Bar(x=hist_df["month"], y=hist_df["expenses"], name="Expenses", marker_color=NEGATIVE))
+        fig.add_trace(go.Scatter(x=hist_df["month"], y=hist_df["net"], name="Net", mode="lines+markers", line=dict(color=ACCENT, width=3)))
+        fig.update_layout(barmode="group", xaxis_title="Month", yaxis_title=f"Amount ({currency})")
+        st.plotly_chart(style_fig(fig, height=320, legend=True), width='stretch')
 
     # Budget health alerts
     if data["budget_limits"]:
@@ -416,6 +445,16 @@ elif page == "Budget":
     else:
         st.error(f"You're spending {fmt(-cash_flow)} more than you earn each month.")
 
+    st.write("")
+    with st.expander("📌 Log this month to your trend history"):
+        st.caption("Save this month's totals so you can track income vs. expenses over time on the Dashboard.")
+        month_choice = st.date_input("Month", value=date.today(), key="history_month_picker")
+        month_str = month_choice.strftime("%Y-%m")
+        if st.button("Save this month's totals", key="save_month_btn"):
+            dm.record_monthly_snapshot(data, month_str, monthly_income, monthly_expenses)
+            st.success(f"Saved totals for {month_choice.strftime('%B %Y')}.")
+            st.rerun()
+
 # ---------------------------------------------------------------------------
 # NET WORTH
 # ---------------------------------------------------------------------------
@@ -466,6 +505,13 @@ elif page == "Net Worth":
             kpi_card("Net worth", fmt(latest["net_worth"]), color=ACCENT)
 
         st.write("")
+        asset_items = {k: v for k, v in latest["assets"].items() if v > 0}
+        if asset_items:
+            st.markdown("#### Asset allocation (latest snapshot)")
+            alloc_df = pd.DataFrame({"category": list(asset_items.keys()), "amount": list(asset_items.values())})
+            fig = px.pie(alloc_df, values="amount", names="category", hole=0.55, color_discrete_sequence=PALETTE)
+            st.plotly_chart(style_fig(fig, height=300, legend=True), width='stretch')
+
         st.markdown("#### History")
         for snap in reversed(data["net_worth_snapshots"]):
             c1, c2, c3 = st.columns([2, 3, 1])
@@ -534,7 +580,7 @@ elif page == "Calculators":
 
     calc_tab = st.selectbox(
         "Choose a calculator",
-        ["Loan / EMI calculator", "SIP & lump sum growth", "Retirement planner", "Goal-based SIP"],
+        ["Loan / EMI calculator", "SIP & lump sum growth", "Retirement planner", "Goal-based SIP", "Debt payoff planner"],
     )
     st.write("")
 
@@ -658,6 +704,74 @@ elif page == "Calculators":
         kpi_card("Required monthly investment", fmt(required), color=ACCENT)
         st.caption("This is how much you'd need to invest each month, assuming the stated rate of return, to reach your target. Estimates only.")
 
+    # ---- Debt payoff planner ----
+    elif calc_tab == "Debt payoff planner":
+        st.caption("Add your debts below, then compare the avalanche (highest interest first) and snowball (smallest balance first) payoff strategies.")
+
+        with st.expander("➕ Add a debt", expanded=len(data["debts"]) == 0):
+            with st.form("add_debt_form", clear_on_submit=True):
+                c1, c2, c3, c4 = st.columns(4)
+                d_name = c1.text_input("Debt name", placeholder="e.g. Credit card")
+                d_balance = c2.number_input("Current balance", min_value=0.0, step=1000.0)
+                d_rate = c3.number_input("Annual interest rate (%)", min_value=0.0, step=0.5, value=18.0)
+                d_min = c4.number_input("Minimum monthly payment", min_value=0.0, step=100.0)
+                if st.form_submit_button("Add debt", width='stretch'):
+                    if d_name and d_balance > 0:
+                        dm.add_debt(data, d_name, d_balance, d_rate, d_min)
+                        st.rerun()
+                    else:
+                        st.warning("Enter a debt name and a balance greater than 0.")
+
+        if data["debts"]:
+            for d in data["debts"]:
+                c1, c2, c3, c4, c5 = st.columns([2.5, 1.5, 1.5, 1.5, 0.5])
+                c1.write(f"**{d['name']}**")
+                c2.write(fmt(d["balance"]))
+                c3.write(f"{d['interest_rate']:.1f}%")
+                c4.write(f"Min {fmt(d['min_payment'])}")
+                if c5.button("🗑️", key=f"del_debt_{d['id']}"):
+                    dm.delete_debt(data, d["id"])
+                    st.rerun()
+
+            st.write("")
+            extra_payment = st.number_input("Extra monthly payment (beyond minimums)", min_value=0.0, step=500.0, value=0.0)
+
+            col1, col2 = st.columns(2)
+            avalanche = calc.debt_payoff_plan(data["debts"], extra_payment, "avalanche")
+            snowball = calc.debt_payoff_plan(data["debts"], extra_payment, "snowball")
+
+            with col1:
+                st.markdown("##### Avalanche (highest interest first)")
+                kpi_card("Debt-free in", f"{avalanche['months']} months", color=ACCENT)
+                st.write("")
+                kpi_card("Total interest paid", fmt(avalanche["total_interest"]), color=NEGATIVE)
+                st.caption("Payoff order: " + " → ".join(p["name"] for p in avalanche["payoff_order"]))
+
+            with col2:
+                st.markdown("##### Snowball (smallest balance first)")
+                kpi_card("Debt-free in", f"{snowball['months']} months", color=ACCENT)
+                st.write("")
+                kpi_card("Total interest paid", fmt(snowball["total_interest"]), color=NEGATIVE)
+                st.caption("Payoff order: " + " → ".join(p["name"] for p in snowball["payoff_order"]))
+
+            interest_diff = snowball["total_interest"] - avalanche["total_interest"]
+            if abs(interest_diff) > 1:
+                cheaper = "avalanche" if interest_diff > 0 else "snowball"
+                st.info(f"The {cheaper} method saves you {fmt(abs(interest_diff))} in interest, "
+                        f"{'though snowball can feel more motivating by clearing small debts first.' if cheaper == 'avalanche' else ''}")
+
+            fig = go.Figure()
+            av_df = pd.DataFrame(avalanche["monthly_log"])
+            sn_df = pd.DataFrame(snowball["monthly_log"])
+            fig.add_trace(go.Scatter(x=av_df["month"], y=av_df["total_balance"], name="Avalanche", line=dict(color=ACCENT, width=3)))
+            fig.add_trace(go.Scatter(x=sn_df["month"], y=sn_df["total_balance"], name="Snowball", line=dict(color=INFO, width=3, dash="dot")))
+            fig.update_layout(xaxis_title="Month", yaxis_title=f"Remaining balance ({currency})")
+            st.markdown("#### Remaining balance over time")
+            st.plotly_chart(style_fig(fig, height=320, legend=True), width='stretch')
+        else:
+            st.info("Add a debt above to see your payoff plan.")
+        st.caption("Estimates only — assumes payments are made consistently and rates stay fixed.")
+
 # ---------------------------------------------------------------------------
 # SETTINGS
 # ---------------------------------------------------------------------------
@@ -678,11 +792,14 @@ elif page == "Settings":
     st.markdown("#### Export your data")
     st.caption(f"Stored locally at `{dm.DATA_FILE}` — nothing leaves your machine.")
 
-    ec1, ec2, ec3, ec4 = st.columns(4)
+    ec1, ec2, ec3 = st.columns(3)
     ec1.download_button("⬇️ Income (CSV)", data=dm.export_income_csv(data), file_name="income.csv", mime="text/csv", width='stretch')
     ec2.download_button("⬇️ Expenses (CSV)", data=dm.export_expenses_csv(data), file_name="expenses.csv", mime="text/csv", width='stretch')
     ec3.download_button("⬇️ Net worth (CSV)", data=dm.export_net_worth_csv(data), file_name="net_worth.csv", mime="text/csv", width='stretch')
+    ec4, ec5, ec6 = st.columns(3)
     ec4.download_button("⬇️ Goals (CSV)", data=dm.export_goals_csv(data), file_name="goals.csv", mime="text/csv", width='stretch')
+    ec5.download_button("⬇️ Monthly history (CSV)", data=dm.export_monthly_history_csv(data), file_name="monthly_history.csv", mime="text/csv", width='stretch')
+    ec6.download_button("⬇️ Debts (CSV)", data=dm.export_debts_csv(data), file_name="debts.csv", mime="text/csv", width='stretch')
 
     st.write("")
     import os as _os

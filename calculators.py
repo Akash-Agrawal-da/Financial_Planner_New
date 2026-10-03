@@ -105,6 +105,76 @@ def retirement_corpus(current_age, retirement_age, monthly_expense_today,
     }
 
 
+def debt_payoff_plan(debts, extra_monthly_payment=0, strategy="avalanche"):
+    """
+    Simulate paying off multiple debts using the avalanche (highest interest
+    rate first) or snowball (smallest balance first) method. `debts` is a
+    list of dicts with name, balance, interest_rate (annual %), min_payment.
+    Returns months to debt-free, total interest paid, and a payoff order.
+    """
+    working = [dict(d) for d in debts if d["balance"] > 0]
+    if not working:
+        return {"months": 0, "total_interest": 0, "payoff_order": [], "monthly_log": []}
+
+    if strategy == "avalanche":
+        working.sort(key=lambda d: -d["interest_rate"])
+    else:  # snowball
+        working.sort(key=lambda d: d["balance"])
+
+    total_interest = 0.0
+    month = 0
+    payoff_order = []
+    monthly_log = []
+    extra_pool = extra_monthly_payment
+
+    while working and month < 1200:  # 100-year safety cap
+        month += 1
+        month_interest = 0.0
+        freed_up = 0.0  # min payments from debts paid off this month, added to next month's extra pool
+
+        # Accrue interest and apply minimum payments first
+        for d in working:
+            interest = d["balance"] * (d["interest_rate"] / 12 / 100)
+            month_interest += interest
+            d["balance"] += interest
+            pay = min(d["min_payment"], d["balance"])
+            d["balance"] -= pay
+
+        # Apply extra payment to the top-priority (first) debt in the sorted order
+        pool = extra_pool
+        for d in working:
+            if pool <= 0:
+                break
+            pay_extra = min(pool, d["balance"])
+            d["balance"] -= pay_extra
+            pool -= pay_extra
+
+        total_interest += month_interest
+
+        still_owing = []
+        for d in working:
+            if d["balance"] <= 0.01:
+                payoff_order.append({"name": d["name"], "month_paid_off": month})
+                freed_up += d["min_payment"]
+            else:
+                still_owing.append(d)
+        working = still_owing
+        extra_pool += freed_up  # roll freed-up minimums into the extra payment pool
+
+        monthly_log.append({
+            "month": month,
+            "total_balance": sum(d["balance"] for d in working),
+            "interest_paid": month_interest,
+        })
+
+    return {
+        "months": month,
+        "total_interest": total_interest,
+        "payoff_order": payoff_order,
+        "monthly_log": monthly_log,
+    }
+
+
 def required_sip_for_goal(target_amount, years, annual_rate_pct):
     """Monthly investment required to reach a target amount by a given time,
     at an assumed rate of return."""

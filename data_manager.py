@@ -18,6 +18,8 @@ DEFAULT_DATA = {
     "budget_limits": {},          # {category: monthly_limit}
     "net_worth_snapshots": [],    # [{id, date, assets, liabilities, totals}]
     "goals": [],                  # [{id, name, target_amount, current_amount, target_date, category}]
+    "monthly_history": [],        # [{id, month, income, expenses, net}]
+    "debts": [],                   # [{id, name, balance, interest_rate, min_payment}]
     "settings": {
         "currency": "Rs.",
     },
@@ -161,6 +163,47 @@ def delete_goal(data, goal_id):
     save_data(data)
 
 
+# ---------- Monthly history ----------
+
+def record_monthly_snapshot(data, month_str, income, expenses):
+    """Upsert the income/expense totals for a given month (YYYY-MM)."""
+    existing = next((m for m in data["monthly_history"] if m["month"] == month_str), None)
+    if existing:
+        existing["income"] = income
+        existing["expenses"] = expenses
+        existing["net"] = income - expenses
+    else:
+        data["monthly_history"].append({
+            "id": _new_id(data["monthly_history"]),
+            "month": month_str,
+            "income": income,
+            "expenses": expenses,
+            "net": income - expenses,
+        })
+    data["monthly_history"].sort(key=lambda m: m["month"])
+    save_data(data)
+
+
+def delete_monthly_snapshot(data, item_id):
+    data["monthly_history"] = [m for m in data["monthly_history"] if m["id"] != item_id]
+    save_data(data)
+
+
+# ---------- Debts ----------
+
+def add_debt(data, name, balance, interest_rate, min_payment):
+    data["debts"].append({
+        "id": _new_id(data["debts"]), "name": name, "balance": balance,
+        "interest_rate": interest_rate, "min_payment": min_payment,
+    })
+    save_data(data)
+
+
+def delete_debt(data, item_id):
+    data["debts"] = [d for d in data["debts"] if d["id"] != item_id]
+    save_data(data)
+
+
 # ---------- Derived helpers ----------
 
 def monthly_amount(amount, frequency):
@@ -206,3 +249,11 @@ def export_net_worth_csv(data):
 
 def export_goals_csv(data):
     return to_csv(data["goals"], ["id", "name", "category", "target_amount", "current_amount", "target_date"])
+
+
+def export_monthly_history_csv(data):
+    return to_csv(data["monthly_history"], ["id", "month", "income", "expenses", "net"])
+
+
+def export_debts_csv(data):
+    return to_csv(data["debts"], ["id", "name", "balance", "interest_rate", "min_payment"])
