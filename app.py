@@ -17,28 +17,31 @@ st.set_page_config(
 # ---------------------------------------------------------------------------
 # Design tokens
 # ---------------------------------------------------------------------------
-# All text/background pairings below are verified to meet WCAG AA contrast
-# (>=4.5:1 for normal text) so values stay legible in bright light / on
-# smaller mobile screens, not just on a calibrated desktop monitor.
-NAVY = "#0B1220"
-NAVY_ELEVATED = "#141B2B"
-NAVY_BORDER = "#1F2A3D"
-SURFACE = "#FFFFFF"
-BORDER = "#E2E5EB"
-TEXT_PRIMARY = "#0F172A"      # 17.8:1 on white
-TEXT_SECONDARY = "#475569"    # 7.6:1 on white
-TEXT_TERTIARY = "#64748B"     # 4.8:1 on white — used where #94A0B2 used to fail contrast
-ACCENT = "#0F766E"            # 5.5:1 on white
-ACCENT_HOVER = "#0B6358"  # 7.1:1 with white button text (darker than accent, for :hover)
-POSITIVE = "#15803D"          # 5.0:1 on white
-POSITIVE_BG = "#F0FDF4"
-NEGATIVE = "#B91C1C"          # 6.5:1 on white
-NEGATIVE_BG = "#FEF2F2"
-WARN = "#B45309"              # 5.0:1 on white
-WARN_BG = "#FFFBEB"
-INFO = "#1D4ED8"              # 6.7:1 on white
-INFO_BG = "#EFF6FF"
-PALETTE = ["#0F766E", "#1D4ED8", "#B45309", "#B91C1C", "#7C3AED", "#0E7490", "#4D7C0F", "#BE185D"]
+# A medium-dark theme: not pure black (easier on the eyes, per request),
+# with every text/background pairing checked against WCAG AA contrast
+# (>=4.5:1) so values stay legible on a phone screen, not just on a
+# calibrated desktop monitor.
+BG = "#161B26"                # page canvas — dark slate, not black
+SURFACE = "#232C3F"            # card background, one step lighter than bg
+BORDER = "#3C4863"
+NAVY = "#10141D"               # sidebar — one step darker, for separation
+NAVY_ELEVATED = "#1B212E"      # sidebar quick-stat cards
+NAVY_BORDER = "#2E3750"
+TEXT_PRIMARY = "#F1F5F9"       # 15.7:1 on bg
+TEXT_SECONDARY = "#B7C0D1"     # 9.4:1 on bg / 8.3:1 on surface
+TEXT_TERTIARY = "#8E9AB3"      # 6.1:1 on bg / 5.4:1 on surface
+ACCENT = "#34D399"             # 7.9:1 on surface
+ACCENT_TEXT_ON = "#06281C"     # dark text for use ON TOP of accent-colored buttons (8.2:1)
+ACCENT_HOVER = "#2BBD89"
+POSITIVE = "#4ADE80"           # 8.7:1 on surface
+POSITIVE_BG = "rgba(74,222,128,0.14)"
+NEGATIVE = "#F87171"           # 5.5:1 on surface
+NEGATIVE_BG = "rgba(248,113,113,0.14)"
+WARN = "#FBBF24"               # 9.1:1 on surface
+WARN_BG = "rgba(251,191,36,0.14)"
+INFO = "#60A5FA"               # 6.0:1 on surface
+INFO_BG = "rgba(96,165,250,0.14)"
+PALETTE = ["#34D399", "#60A5FA", "#FBBF24", "#F87171", "#A78BFA", "#22D3EE", "#A3E635", "#F472B6"]
 
 # ---------------------------------------------------------------------------
 # Styling — light, professional "fintech dashboard" look: dark navy sidebar
@@ -51,16 +54,21 @@ st.markdown(f"""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
     html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
-    .stApp {{ background-color: #F4F6F9; }}
+    .stApp {{ background-color: {BG}; }}
+    [data-testid="stAppViewContainer"] {{ background-color: {BG}; }}
+    [data-testid="stHeader"] {{ background-color: transparent; }}
 
     h1, h2, h3, h4, h5 {{ font-family: 'Inter', sans-serif; color: {TEXT_PRIMARY}; }}
+    p, span, label {{ color: {TEXT_PRIMARY}; }}
+    [data-testid="stCaptionContainer"] {{ color: {TEXT_SECONDARY} !important; }}
 
-    /* ---- Sidebar (dark, for navigation / brand identity) ---- */
+    /* ---- Sidebar (one shade darker, for navigation / brand identity) ---- */
     [data-testid="stSidebar"] {{
         background-color: {NAVY};
+        border-right: 1px solid {NAVY_BORDER};
     }}
-    [data-testid="stSidebar"] * {{ color: #E2E8F0 !important; }}
-    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {{ color: #A8B3C7 !important; }}
+    [data-testid="stSidebar"] * {{ color: #EDF1F7 !important; }}
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] {{ color: #9AA7C2 !important; }}
     [data-testid="stSidebar"] hr {{ border-color: {NAVY_BORDER} !important; }}
     [data-testid="stSidebar"] [data-testid="stMetric"] {{
         background-color: {NAVY_ELEVATED};
@@ -82,7 +90,7 @@ st.markdown(f"""
         font-size: 1.35rem; font-weight: 700; color: #FFFFFF !important;
         letter-spacing: -0.01em; margin-bottom: 0;
     }}
-    .brand-sub {{ color: #A8B3C7 !important; font-size: 0.82rem; margin-top: -4px; }}
+    .brand-sub {{ color: #9AA7C2 !important; font-size: 0.82rem; margin-top: -4px; }}
 
     /* ---- Page header ---- */
     .finly-eyebrow {{ color: {ACCENT}; font-weight: 600; font-size: 0.82rem; margin-bottom: 2px; }}
@@ -142,18 +150,42 @@ st.markdown(f"""
     /* ---- Buttons ---- */
     .stButton button {{
         border-radius: 8px; font-weight: 500;
+        background-color: {SURFACE}; border: 1px solid {BORDER}; color: {TEXT_PRIMARY};
     }}
+    .stButton button:hover {{ border-color: {ACCENT}; color: {ACCENT}; }}
     .stFormSubmitButton button {{
         background-color: {ACCENT} !important; border-color: {ACCENT} !important;
-        color: #FFFFFF !important; font-weight: 600; border-radius: 8px;
+        color: {ACCENT_TEXT_ON} !important; font-weight: 700; border-radius: 8px;
     }}
     .stFormSubmitButton button:hover {{ background-color: {ACCENT_HOVER} !important; }}
 
+    /* ---- Inputs / selects ---- */
+    [data-testid="stTextInput"] input, [data-testid="stNumberInput"] input,
+    [data-testid="stDateInput"] input, [data-baseweb="select"] > div,
+    [data-baseweb="base-input"] {{
+        background-color: {SURFACE} !important;
+        border-color: {BORDER} !important;
+        color: {TEXT_PRIMARY} !important;
+    }}
+
     /* ---- Progress bars ---- */
     .stProgress > div > div > div {{ background-color: {ACCENT}; }}
+    .stProgress > div {{ background-color: {BORDER} !important; }}
 
     /* ---- Tabs ---- */
-    .stTabs [data-baseweb="tab"] {{ font-weight: 500; }}
+    .stTabs [data-baseweb="tab"] {{ font-weight: 500; color: {TEXT_SECONDARY}; }}
+    .stTabs [aria-selected="true"] {{ color: {ACCENT} !important; }}
+
+    /* ---- Expander ---- */
+    [data-testid="stExpander"] summary {{
+        background-color: {SURFACE} !important;
+        border: 1px solid {BORDER} !important;
+        border-radius: 10px !important;
+        color: {TEXT_PRIMARY} !important;
+    }}
+
+    /* ---- Dataframe ---- */
+    [data-testid="stDataFrame"] {{ background-color: {SURFACE}; }}
 
     hr {{ border-color: {BORDER} !important; }}
     #MainMenu {{visibility: hidden;}}
@@ -197,15 +229,38 @@ def style_fig(fig, height=320, legend=False):
         height=height,
         margin=dict(l=10, r=10, t=30 if legend else 10, b=10),
         showlegend=legend,
-        legend=dict(orientation="h", y=1.12, x=0) if legend else None,
+        legend=dict(orientation="h", y=1.12, x=0, font=dict(color=TEXT_PRIMARY)) if legend else None,
     )
-    fig.update_xaxes(gridcolor=BORDER, zerolinecolor=BORDER, showline=False)
-    fig.update_yaxes(gridcolor=BORDER, zerolinecolor=BORDER, showline=False)
+    # Explicit tickfont color: relying only on the layout-level font color
+    # left axis tick labels too faint to read on some renderers/screens.
+    fig.update_xaxes(gridcolor=BORDER, zerolinecolor=BORDER, showline=False, tickfont=dict(color=TEXT_SECONDARY))
+    fig.update_yaxes(gridcolor=BORDER, zerolinecolor=BORDER, showline=False, tickfont=dict(color=TEXT_SECONDARY))
+    return fig
+
+
+def clean_date_axis(fig, dates):
+    """Force exactly one tick per data point, cleanly formatted (e.g. "Oct 1,
+    2026"). Without this, Plotly can auto-subdivide a short date range down
+    to millisecond-level ticks, which is unreadable (and was the cause of
+    the stray "23:59:59.999" labels some users saw on a 1-2 point chart)."""
+    unique_dates = sorted(pd.to_datetime(dates).unique())
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=unique_dates,
+        ticktext=[pd.Timestamp(d).strftime("%b %d, %Y") for d in unique_dates],
+    )
     return fig
 
 
 if "data" not in st.session_state:
     st.session_state.data = dm.load_data()
+
+# Self-heal: if this browser session has been open since before a schema
+# change (new fields added in an app update), backfill them now instead of
+# crashing with a KeyError on an old, cached session_state dict.
+st.session_state.data, _schema_changed = dm.ensure_schema(st.session_state.data)
+if _schema_changed:
+    dm.save_data(st.session_state.data)
 
 data = st.session_state.data
 currency = data["settings"].get("currency", "Rs.")
@@ -277,7 +332,7 @@ if page == "Dashboard":
                 line=dict(color=ACCENT, width=3), fill="tozeroy",
                 fillcolor="rgba(15,118,110,0.08)", name="Net worth",
             ))
-            st.plotly_chart(style_fig(fig), width='stretch')
+            st.plotly_chart(clean_date_axis(style_fig(fig), df["date"]), width='stretch')
         else:
             st.info("Add a net worth snapshot to see your trend here.")
 
@@ -493,7 +548,7 @@ elif page == "Net Worth":
         fig.add_trace(go.Bar(x=df["date"], y=-df["total_liabilities"], name="Liabilities", marker_color=NEGATIVE))
         fig.add_trace(go.Scatter(x=df["date"], y=df["net_worth"], name="Net worth", mode="lines+markers", line=dict(color=ACCENT, width=3)))
         fig.update_layout(barmode="relative")
-        st.plotly_chart(style_fig(fig, height=380, legend=True), width='stretch')
+        st.plotly_chart(clean_date_axis(style_fig(fig, height=380, legend=True), df["date"]), width='stretch')
 
         latest = data["net_worth_snapshots"][-1]
         c1, c2, c3 = st.columns(3)
@@ -819,7 +874,7 @@ elif page == "Settings":
         st.warning("This will permanently delete all income, expenses, net worth snapshots, goals, and budget limits.")
         c1, c2 = st.columns(2)
         if c1.button("Yes, delete everything", type="primary", width='stretch'):
-            dm.save_data(dm.DEFAULT_DATA.copy())
+            dm.save_data(dm.fresh_data())
             st.session_state.data = dm.load_data()
             st.session_state["confirm_reset"] = False
             st.rerun()

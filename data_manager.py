@@ -8,6 +8,7 @@ import json
 import os
 import io
 import csv
+import copy
 from datetime import datetime
 
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "financial_data.json")
@@ -46,24 +47,44 @@ def _new_id(items):
     return max(item.get("id", 0) for item in items) + 1
 
 
+def fresh_data():
+    """A brand-new, fully independent copy of the default data shape.
+    Always use this (never DEFAULT_DATA directly) so that appending to one
+    session's lists can never leak into another session or into the
+    module-level defaults themselves."""
+    return copy.deepcopy(DEFAULT_DATA)
+
+
+def ensure_schema(data):
+    """Self-heal a data dict that may be missing keys added by a later
+    version of the app (e.g. a browser session kept alive across a
+    redeploy that added new fields). Mutates and returns `data`."""
+    changed = False
+    for key, default_value in DEFAULT_DATA.items():
+        if key not in data:
+            data[key] = copy.deepcopy(default_value)
+            changed = True
+    return data, changed
+
+
 def load_data():
     if not os.path.exists(DATA_FILE):
-        save_data(DEFAULT_DATA)
-        return json.loads(json.dumps(DEFAULT_DATA))
+        save_data(fresh_data())
+        return fresh_data()
 
     try:
         with open(DATA_FILE, "r") as f:
             data = json.load(f)
-        for key, default_value in DEFAULT_DATA.items():
-            if key not in data:
-                data[key] = default_value
+        data, changed = ensure_schema(data)
+        if changed:
+            save_data(data)
         return data
     except (json.JSONDecodeError, OSError):
         if os.path.exists(DATA_FILE):
             backup_name = DATA_FILE + f".backup-{int(datetime.now().timestamp())}"
             os.rename(DATA_FILE, backup_name)
-        save_data(DEFAULT_DATA)
-        return json.loads(json.dumps(DEFAULT_DATA))
+        save_data(fresh_data())
+        return fresh_data()
 
 
 def save_data(data):
